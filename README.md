@@ -5,11 +5,11 @@ Fast, thread-safe arena allocators
 
 CgoParam is a refinement & specialization of [cgoalloc](https://github.com/CannibalVox/cgoalloc) - a general-purpose allocation proxying library for cgo.
 
-Cgoalloc offers paging fixed-buffer allocators that would reduce the dependence on C.malloc and C.free (as well as avoiding expensive cgocheckpointers by only passing C memory to C).  It also allows various allocator types to be composed together to create interesting allocation & retainment strategies.
+Cgoalloc offers paging fixed-buffer allocators that can reduce the dependence on C.malloc and C.free (as well as avoiding expensive cgocheckpointers by only passing C memory to C).  It also allows various allocator types to be composed together to create interesting allocation & retainment strategies.
 
 However, cgoalloc requires allocators to be composed from several parts to be effective, and it's not quite as fast as it could be.  The FixedBufferAllocator can perform an allocation and free in 10ns, but an arena allocator built on top of it can take up to 30ns.  That's for incredibly small allocations, too, and it's slower when the arena allocator is built on top of a 3-part allocator to ensure it can handle memory of any size.  cgoalloc structures are also not thread-safe.
 
-These qualities are necessary to support any allocation and retainment strategy you might like.
+As a result of these limitations, cgoalloc can support any allocation and retainment strategy you might like.
 
 By contrast, cgoparam is built for a single purpose- temporary allocations of cgo parameter pointers, assigned just before a cgo call and freed just after.  It uses a sync.Pool in order to make the library thread-safe (allocators are not thread-safe, but each thread can freely pull and return allocators), meaning that cgoparam can be an implementation detail of your cgo wrapper library- a thing your users don't have to worry about.
 
