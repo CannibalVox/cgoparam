@@ -94,3 +94,22 @@ func TestCouldBeStandaloneButFit(t *testing.T) {
 	require.Equal(t, 4096, alloc.basePages[0].remainingSize)
 }
 
+func TestCString(t *testing.T) {
+	alloc := GetAlloc()
+	defer ReturnAlloc(alloc)
+
+	cStr := alloc.CString("WOW STRING")
+	goStr := callGoString(cStr)
+	require.Equal(t, "WOW STRING", goStr)
+}
+
+func TestCBytes(t *testing.T) {
+	alloc := GetAlloc()
+	defer ReturnAlloc(alloc)
+
+	b := []byte("WOW STRING")
+
+	cBytes := alloc.CBytes(b)
+	goBytes := callGoBytes(cBytes, len(b))
+	require.Equal(t, []byte("WOW STRING"), goBytes)
+}

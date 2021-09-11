@@ -71,6 +71,23 @@ func (a *Allocator) Malloc(size int) unsafe.Pointer {
 	return currentPage.NextPtr(size)
 }
 
+func (a *Allocator) CString(str string) unsafe.Pointer {
+	strByteLen := len(str)+1
+	ptr := a.Malloc(strByteLen)
+	ptrSlice := ([]byte)(unsafe.Slice((*byte)(ptr), strByteLen))
+	copy(ptrSlice, str)
+	ptrSlice[strByteLen-1] = 0
+	return ptr
+}
+
+func (a *Allocator) CBytes(b []byte) unsafe.Pointer {
+	byteLen := len(b)
+	ptr := a.Malloc(byteLen)
+	ptrSlice := ([]byte)(unsafe.Slice((*byte)(ptr), byteLen))
+	copy(ptrSlice, b)
+	return ptr
+}
+
 func (a *Allocator) freeAll() {
 	basePageCount := len(a.basePages)
 	standaloneCount := len(a.standaloneAllocs)
