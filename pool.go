@@ -1,18 +1,25 @@
 package cgoparam
 
-import "sync"
+import (
+	"runtime"
+	"sync"
+)
 
 const basePageSize = 4096
 const considerStandaloneSize = 1024
 
 var allocatorPool = sync.Pool{
 	New: func() interface{} {
-		return &Allocator{
-			basePageSize: basePageSize,
+		allocator := &Allocator{
+			basePageSize:           basePageSize,
 			considerStandaloneSize: considerStandaloneSize,
 
 			basePages: []*allocatorPage{createPage(basePageSize)},
 		}
+		runtime.SetFinalizer(allocator, func(a *Allocator) {
+			a.basePages[0].Destroy()
+		})
+		return allocator
 	},
 }
 
