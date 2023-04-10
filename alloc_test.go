@@ -11,9 +11,9 @@ func TestBasicFunc(t *testing.T) {
 	require.NotNil(t, alloc.Malloc(1000))
 
 	require.Len(t, alloc.basePages, 1)
-	require.Equal(t, 1101, alloc.basePages[0].nextOffset)
+	require.Equal(t, 1112, alloc.basePages[0].nextOffset)
 	require.Equal(t, 4096, alloc.basePages[0].size)
-	require.Equal(t, 2995, alloc.basePages[0].remainingSize)
+	require.Equal(t, 2984, alloc.basePages[0].remainingSize)
 
 	ReturnAlloc(alloc)
 
@@ -34,13 +34,13 @@ func TestMultiPage(t *testing.T) {
 
 	require.Len(t, alloc.basePages, 2)
 	require.Len(t, alloc.standaloneAllocs, 0)
-	require.Equal(t, 3600, alloc.basePages[0].nextOffset)
+	require.Equal(t, 3616, alloc.basePages[0].nextOffset)
 	require.Equal(t, 4096, alloc.basePages[0].size)
-	require.Equal(t, 496, alloc.basePages[0].remainingSize)
+	require.Equal(t, 480, alloc.basePages[0].remainingSize)
 
-	require.Equal(t, 900, alloc.basePages[1].nextOffset)
+	require.Equal(t, 904, alloc.basePages[1].nextOffset)
 	require.Equal(t, 4096, alloc.basePages[1].size)
-	require.Equal(t, 3196, alloc.basePages[1].remainingSize)
+	require.Equal(t, 3192, alloc.basePages[1].remainingSize)
 
 	ReturnAlloc(alloc)
 
@@ -60,9 +60,9 @@ func TestSlightlyTooBigStandalone(t *testing.T) {
 
 	require.Len(t, alloc.basePages, 1)
 	require.Len(t, alloc.standaloneAllocs, 1)
-	require.Equal(t, 3600, alloc.basePages[0].nextOffset)
+	require.Equal(t, 3616, alloc.basePages[0].nextOffset)
 	require.Equal(t, 4096, alloc.basePages[0].size)
-	require.Equal(t, 496, alloc.basePages[0].remainingSize)
+	require.Equal(t, 480, alloc.basePages[0].remainingSize)
 
 	ReturnAlloc(alloc)
 
@@ -82,9 +82,9 @@ func TestCouldBeStandaloneButFit(t *testing.T) {
 
 	require.Len(t, alloc.basePages, 1)
 	require.Len(t, alloc.standaloneAllocs, 0)
-	require.Equal(t, 3900, alloc.basePages[0].nextOffset)
+	require.Equal(t, 3912, alloc.basePages[0].nextOffset)
 	require.Equal(t, 4096, alloc.basePages[0].size)
-	require.Equal(t, 196, alloc.basePages[0].remainingSize)
+	require.Equal(t, 184, alloc.basePages[0].remainingSize)
 
 	ReturnAlloc(alloc)
 

@@ -8,8 +8,8 @@ import "unsafe"
 
 type allocatorPage struct {
 	remainingSize int
-	nextOffset int
-	size int
+	nextOffset    int
+	size          int
 
 	buffer unsafe.Pointer
 }
@@ -18,8 +18,8 @@ func createPage(size int) *allocatorPage {
 	ptr := C.malloc(C.size_t(size))
 	return &allocatorPage{
 		remainingSize: size,
-		nextOffset: 0,
-		size: size,
+		nextOffset:    0,
+		size:          size,
 
 		buffer: ptr,
 	}
@@ -40,17 +40,24 @@ func (p *allocatorPage) NextPtr(size int) unsafe.Pointer {
 	}
 
 	ptr := unsafe.Add(p.buffer, p.nextOffset)
+	oldOffset := p.nextOffset
+
 	p.nextOffset += size
-	p.remainingSize -= size
+	alignment := p.nextOffset % 8
+	if alignment != 0 {
+		p.nextOffset = p.nextOffset - (p.nextOffset % 8) + 8
+	}
+
+	p.remainingSize -= p.nextOffset - oldOffset
 
 	return ptr
 }
 
 type Allocator struct {
-	basePageSize int
+	basePageSize           int
 	considerStandaloneSize int
 
-	basePages []*allocatorPage
+	basePages        []*allocatorPage
 	standaloneAllocs []unsafe.Pointer
 }
 
@@ -72,7 +79,7 @@ func (a *Allocator) Malloc(size int) unsafe.Pointer {
 }
 
 func (a *Allocator) CString(str string) unsafe.Pointer {
-	strByteLen := len(str)+1
+	strByteLen := len(str) + 1
 	ptr := a.Malloc(strByteLen)
 	ptrSlice := ([]byte)(unsafe.Slice((*byte)(ptr), strByteLen))
 	copy(ptrSlice, str)
